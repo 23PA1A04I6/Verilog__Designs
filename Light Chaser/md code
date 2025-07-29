@@ -1,0 +1,32 @@
+// LightChaser
+// Rotates a single '1' bit across N LEDs to simulate a running light effect.
+// Moves left every few clock cycles when enabled.
+
+module LightChaser #(
+    parameter N = 8,               // Number of LEDs
+    parameter DELAY = 4            // Delay in clock cycles between shifts
+)(
+    input clk,
+    input reset,                   // synchronous reset
+    input enable,                  // enable for shifting
+    output reg [N-1:0] leds        // LED output
+);
+
+    reg [$clog2(DELAY)-1:0] delay_counter;
+
+    always @(posedge clk) begin
+        if (reset) begin
+            leds <= 1;             // Start with rightmost LED on
+            delay_counter <= 0;
+        end else if (enable) begin
+            if (delay_counter == DELAY - 1) begin
+                delay_counter <= 0;
+                // Rotate left
+                leds <= (leds << 1) | leds[N-1];
+            end else begin
+                delay_counter <= delay_counter + 1;
+            end
+        end
+    end
+
+endmodule
