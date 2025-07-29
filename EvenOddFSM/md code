@@ -1,0 +1,41 @@
+// EvenOddFSM
+// This FSM keeps track of the parity of input bits (1 = toggle).
+// Output 'is_even' is 1 when the number of 1s is even.
+
+module EvenOddFSM (
+    input clk,
+    input reset,          // synchronous reset
+    input bit_in,         // input bit (0 or 1)
+    output reg is_even    // 1 if even number of 1s, 0 if odd
+);
+
+    // State Encoding
+    typedef enum logic [0:0] {
+        EVEN = 1'b0,
+        ODD  = 1'b1
+    } state_t;
+
+    state_t current_state, next_state;
+
+    // State Register
+    always @(posedge clk) begin
+        if (reset)
+            current_state <= EVEN;
+        else
+            current_state <= next_state;
+    end
+
+    // Next State Logic
+    always @(*) begin
+        case (current_state)
+            EVEN: next_state = (bit_in) ? ODD : EVEN;
+            ODD : next_state = (bit_in) ? EVEN : ODD;
+        endcase
+    end
+
+    // Output Logic
+    always @(*) begin
+        is_even = (current_state == EVEN);
+    end
+
+endmodule
