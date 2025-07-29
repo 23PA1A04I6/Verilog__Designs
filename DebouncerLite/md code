@@ -1,0 +1,37 @@
+// DebouncerLite
+// Filters a noisy input signal. Outputs a clean high only when the input
+// remains high for a defined number of clock cycles (stable_count).
+
+module DebouncerLite #(
+    parameter STABLE_COUNT = 3  // Number of stable cycles required
+)(
+    input clk,
+    input reset,       // synchronous reset
+    input noisy_in,    // raw mechanical input (e.g., push button)
+    output reg clean_out // debounced output
+);
+
+    reg [$clog2(STABLE_COUNT+1)-1:0] count;
+    reg prev_in;
+
+    always @(posedge clk) begin
+        if (reset) begin
+            count <= 0;
+            clean_out <= 0;
+            prev_in <= 0;
+        end else begin
+            if (noisy_in == prev_in) begin
+                if (count < STABLE_COUNT)
+                    count <= count + 1;
+            end else begin
+                count <= 0;  // reset counter if input changes
+            end
+
+            prev_in <= noisy_in;
+
+            if (count == STABLE_COUNT)
+                clean_out <= noisy_in;
+        end
+    end
+
+endmodule
