@@ -1,0 +1,26 @@
+
+// Module: BitBalancer
+// Description: Counts the number of 1's in 8-bit input and gives output on each clock cycle
+
+
+module BitBalancer(
+    input wire clk,              // Clock input
+    input wire reset,            // Active-high reset
+    input wire [7:0] data_in,    // 8-bit input
+    output reg [3:0] count_out   // Output count (0–8), 4 bits are enough
+);
+
+    integer i; // Loop variable
+
+    always @(posedge clk or posedge reset) begin
+        if (reset) begin
+            count_out <= 4'd0; // Reset output to 0
+        end else begin
+            count_out <= 4'd0; // Clear count before new calculation
+            for (i = 0; i < 8; i = i + 1) begin
+                count_out <= count_out + data_in[i]; // Add bit if it's 1
+            end
+        end
+    end
+
+endmodule
