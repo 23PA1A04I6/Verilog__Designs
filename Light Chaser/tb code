@@ -1,0 +1,41 @@
+module tb_LightChaser;
+
+    reg clk, reset, enable;
+    wire [7:0] leds;
+
+    LightChaser #(8, 4) uut (
+        .clk(clk),
+        .reset(reset),
+        .enable(enable),
+        .leds(leds)
+    );
+
+    // Clock generation
+    initial begin
+        clk = 0;
+        forever #5 clk = ~clk;  // 10 time unit clock period
+    end
+
+    // Dumpfile and dumpvars for waveform
+    initial begin
+        $dumpfile("dump.vcd");
+        $dumpvars(0, tb_LightChaser);
+    end
+
+    // Stimulus
+    initial begin
+        $display("Time\tLEDs");
+        $monitor("%0t\t%b", $time, leds);
+
+        reset = 1; enable = 0; #10;
+        reset = 0;
+
+        enable = 1; #200;
+
+        enable = 0; #30;  // Pause
+        enable = 1; #100;
+
+        $finish;
+    end
+
+endmodule
