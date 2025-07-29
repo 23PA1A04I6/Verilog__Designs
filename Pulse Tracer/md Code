@@ -1,0 +1,12 @@
+module pulse_detector(
+    input clk,
+    input noisy_in,
+    output reg pulse_out
+);
+    reg noisy_in_d;
+
+    always @(posedge clk) begin
+        noisy_in_d <= noisy_in;             // register previous value
+        pulse_out <= noisy_in & ~noisy_in_d; // rising edge detection
+    end
+endmodule
