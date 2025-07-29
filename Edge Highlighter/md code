@@ -1,0 +1,28 @@
+module EdgeHighlighter (
+    input  logic clk,
+    input  logic rst,
+    input  logic in,
+    output logic rise_pulse,
+    output logic fall_pulse
+);
+
+    logic in_d;  // delayed version of input for edge detection
+
+    always_ff @(posedge clk or posedge rst) begin
+        if (rst) begin
+            in_d <= 0;
+            rise_pulse <= 0;
+            fall_pulse <= 0;
+        end else begin
+            // Rising edge: previous 0, current 1
+            rise_pulse <= (~in_d) & in;
+
+            // Falling edge: previous 1, current 0
+            fall_pulse <= in_d & (~in);
+
+            // Update previous input
+            in_d <= in;
+        end
+    end
+
+endmodule
