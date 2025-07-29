@@ -1,0 +1,61 @@
+// Testbench for NibbleSwapper module
+
+module tb_NibbleSwapper;
+
+    // Testbench signals
+    reg clk;
+    reg reset;
+    reg control;
+    reg [7:0] data_in;
+    wire [7:0] data_out;
+
+    // Instantiate DUT
+    NibbleSwapper uut (
+        .clk(clk),
+        .reset(reset),
+        .control(control),
+        .data_in(data_in),
+        .data_out(data_out)
+    );
+
+    // Clock generation: 10ns period
+    always #5 clk = ~clk;
+  initial begin
+    $dumpfile("dump.vcd");
+    $dumpvars(0,tb_NibbleSwapper);
+  end
+
+    // Test sequence
+    initial begin
+        $display("Time\tReset\tCtrl\tData_in\t\tData_out");
+
+        clk = 0;
+        reset = 1; control = 0; data_in = 8'h00;
+        #10;
+
+        reset = 0;
+
+        // Test 1: Swap 0xAB (10101011)
+        data_in = 8'hAB; control = 1;
+        #10; $display("%0t\t%b\t%b\t%h\t\t%h", $time, reset, control, data_in, data_out);
+
+        // Test 2: Hold output (control = 0)
+        data_in = 8'hF0; control = 0;
+        #10; $display("%0t\t%b\t%b\t%h\t\t%h", $time, reset, control, data_in, data_out);
+
+        // Test 3: Swap 0x3C (00111100)
+        data_in = 8'h3C; control = 1;
+        #10; $display("%0t\t%b\t%b\t%h\t\t%h", $time, reset, control, data_in, data_out);
+
+        // Test 4: Again hold (new input, control low)
+        data_in = 8'h5A; control = 0;
+        #10; $display("%0t\t%b\t%b\t%h\t\t%h", $time, reset, control, data_in, data_out);
+
+        // Reset output
+        reset = 1; #10;
+        $display("%0t\t%b\t%b\t%h\t\t%h", $time, reset, control, data_in, data_out);
+
+        $finish;
+    end
+
+endmodule
