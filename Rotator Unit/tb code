@@ -1,0 +1,39 @@
+module RotatorUnit_tb;
+
+    logic clk, rst, dir, load;
+    logic [7:0] in;
+    logic [7:0] out;
+
+    RotatorUnit uut (
+        .clk(clk),
+        .rst(rst),
+        .dir(dir),
+        .in(in),
+        .load(load),
+        .out(out)
+    );
+
+    always #5 clk = ~clk;
+
+    initial begin
+        $dumpfile("dump.vcd");              // <-- changed filename
+        $dumpvars(0, RotatorUnit_tb);
+
+        clk = 0; rst = 1; load = 0; in = 8'b00011011; dir = 1; // rotate left
+        #10 rst = 0;
+
+        // Load input value
+        #10 load = 1; #10 load = 0;
+
+        // Rotate left for 3 cycles
+        repeat (3) #10;
+
+        // Change to rotate right
+        dir = 0;
+        repeat (3) #10;
+
+        #20 $finish;
+    end
+
+endmodule
+
