@@ -1,0 +1,60 @@
+module tb_seq_check;
+    reg clk;
+    reg reset;
+    reg in;
+    wire flag;
+
+    seq_check uut (
+        .clk(clk),
+        .reset(reset),
+        .in(in),
+        .flag(flag)
+    );
+
+    // Clock generation: 10 ns period
+    initial begin
+        clk = 0;
+        forever #5 clk = ~clk;
+    end
+
+    // Stimulus
+    initial begin
+        reset = 1; in = 0;
+        #12 reset = 0;
+
+        // Generate rising edges: should trigger flag
+        #10 in = 1; #10 in = 0;  // rising edge
+        #10 in = 1; #10 in = 0;  // rising edge
+        #10 in = 1; #10 in = 0;  // rising edge (3 rising edges within ~5 cycles)
+
+        // wait a bit
+        #50;
+
+        // Only two rising edges: should NOT trigger flag
+        #10 in = 1; #10 in = 0;
+        #10 in = 1; #10 in = 0;
+
+        #50;
+
+        // Four rising edges within 5 cycles: should trigger flag
+        #10 in = 1; #10 in = 0;
+        #10 in = 1; #10 in = 0;
+        #10 in = 1; #10 in = 0;
+        #10 in = 1; #10 in = 0;
+
+        #50 $finish;
+    end
+
+    // Dump file for waveform
+    initial begin
+        $dumpfile("dump.vcd");
+        $dumpvars(0, tb_seq_check);
+    end
+
+    initial begin
+        $display("Time\tin\tflag");
+        $monitor("%0t\t%b\t%b", $time, in, flag);
+    end
+endmodule
+
+
