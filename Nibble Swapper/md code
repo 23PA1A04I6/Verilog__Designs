@@ -1,0 +1,24 @@
+// Code your design here
+// Module: NibbleSwapper
+// Description: Swaps upper and lower nibbles of 8-bit input when control is high.
+//              Holds previous output value when control is low.
+
+module NibbleSwapper (
+    input wire clk,               // Clock input
+    input wire reset,             // Active-high reset
+    input wire control,           // Control signal to trigger swapping
+    input wire [7:0] data_in,     // 8-bit input data
+    output reg [7:0] data_out     // 8-bit output after nibble swap
+);
+
+    always @(posedge clk or posedge reset) begin
+        if (reset) begin
+            data_out <= 8'b00000000; // Clear output on reset
+        end else if (control) begin
+            // Swap nibbles: upper 4 bits <-> lower 4 bits
+            data_out <= {data_in[3:0], data_in[7:4]};
+        end
+        // else: maintain the previous value (no update)
+    end
+
+endmodule
