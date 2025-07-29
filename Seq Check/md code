@@ -1,0 +1,39 @@
+module seq_check (
+    input clk,
+    input reset,
+    input in,
+    output reg flag
+);
+    reg [4:0] edge_window; // stores if there was a rising edge in each of last 5 cycles
+    reg in_d;              // delayed input to detect rising edge
+
+    integer i;
+    integer sum;
+
+    always @(posedge clk or posedge reset) begin
+        if (reset) begin
+            in_d <= 0;
+            edge_window <= 0;
+            flag <= 0;
+        end else begin
+            in_d <= in;
+
+            // Detect rising edge
+            if (in & ~in_d)
+                edge_window <= {edge_window[3:0], 1'b1};
+            else
+                edge_window <= {edge_window[3:0], 1'b0};
+
+            // Count number of 1's in edge_window
+            sum = 0;
+            for (i = 0; i < 5; i = i + 1)
+                sum = sum + edge_window[i];
+
+            // Assert flag if count >= 3
+            if (sum >= 3)
+                flag <= 1;
+            else
+                flag <= 0;
+        end
+    end
+endmodule
