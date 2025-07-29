@@ -1,0 +1,40 @@
+module tb_pulse_detector;
+    reg clk;
+    reg noisy_in;
+    wire pulse_out;
+
+    pulse_detector uut (
+        .clk(clk),
+        .noisy_in(noisy_in),
+        .pulse_out(pulse_out)
+    );
+
+    // Clock generation: 10 ns period
+    initial begin
+        clk = 0;
+        forever #5 clk = ~clk;
+    end
+
+    // Stimulus
+    initial begin
+        noisy_in = 0;
+        #12 noisy_in = 1;  // rising edge -> should produce pulse
+        #10 noisy_in = 0;
+        #10 noisy_in = 1;  // rising edge again
+        #20 noisy_in = 0;
+        #20 noisy_in = 1;  // rising edge again
+        #30 noisy_in = 0;
+        #30 noisy_in = 1;  // rising edge again
+        #20 $finish;
+    end
+
+    // Dump file for waveform
+    initial begin
+        $dumpfile("dump.vcd");
+        $dumpvars(0, tb_pulse_detector);
+    end
+
+    initial begin
+        $monitor("%0t: noisy_in=%b pulse_out=%b", $time, noisy_in, pulse_out);
+    end
+endmodule
