@@ -1,0 +1,43 @@
+module tb_EvenOddFSM;
+
+    reg clk, reset, bit_in;
+    wire is_even;
+
+    EvenOddFSM uut (
+        .clk(clk),
+        .reset(reset),
+        .bit_in(bit_in),
+        .is_even(is_even)
+    );
+  initial begin
+    $dumpfile("dump.vcd");
+    $dumpvars(0,tb_EvenOddFSM);
+  end
+
+    // Clock generation
+    initial begin
+        clk = 0;
+        forever #5 clk = ~clk;
+    end
+
+    // Test procedure
+    initial begin
+        $display("Time\tbit_in\tis_even");
+        $monitor("%0t\t%b\t%b", $time, bit_in, is_even);
+
+        // Initial reset
+        reset = 1; bit_in = 0; #10;
+        reset = 0;
+
+        // Input sequence: [1, 0, 1, 1, 0, 1]
+        bit_in = 1; #10; // ODD
+        bit_in = 0; #10; // ODD
+        bit_in = 1; #10; // EVEN
+        bit_in = 1; #10; // ODD
+        bit_in = 0; #10; // ODD
+        bit_in = 1; #10; // EVEN
+
+        $finish;
+    end
+
+endmodule
