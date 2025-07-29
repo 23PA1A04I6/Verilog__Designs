@@ -1,0 +1,52 @@
+
+// Testbench for BitBalancer Module
+module tb_BitBalancer;
+
+    // Testbench signals
+    reg clk;
+    reg reset;
+    reg [7:0] data_in;
+    wire [3:0] count_out;
+
+    // Instantiate the DUT (Device Under Test)
+    BitBalancer uut (
+        .clk(clk),
+        .reset(reset),
+        .data_in(data_in),
+        .count_out(count_out)
+    );
+
+    // Clock generator: 10ns clock period
+    always #5 clk = ~clk;
+  initial begin
+    $dumpfile("dump.vcd");
+    $dumpvars(0, tb_BitBalancer);
+  end
+
+    // Test sequence
+    initial begin
+        $display("Time\tReset\tData_in\t\tCount_out");
+
+        clk = 0;
+        reset = 1; data_in = 8'b00000000;
+        #10;
+
+        reset = 0; data_in = 8'b00001111; // 4 ones
+        #10; $display("%0t\t%b\t%b\t\t%d", $time, reset, data_in, count_out);
+
+        data_in = 8'b11111111; // 8 ones
+        #10; $display("%0t\t%b\t%b\t\t%d", $time, reset, data_in, count_out);
+
+        data_in = 8'b00000000; // 0 ones
+        #10; $display("%0t\t%b\t%b\t\t%d", $time, reset, data_in, count_out);
+
+        data_in = 8'b10101010; // 4 ones
+        #10; $display("%0t\t%b\t%b\t\t%d", $time, reset, data_in, count_out);
+
+        reset = 1; // Apply reset again
+        #10; $display("%0t\t%b\t%b\t\t%d", $time, reset, data_in, count_out);
+
+        $finish; // End simulation
+    end
+
+endmodule
