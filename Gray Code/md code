@@ -1,0 +1,24 @@
+module GrayCoder (
+    input  logic [3:0] binary_in,
+    output logic [3:0] gray_out
+);
+
+    // Register to hold previous value
+    logic [3:0] prev_binary;
+
+    always_comb begin
+        // Check if input value changed
+        if (binary_in !== prev_binary) begin
+            gray_out = binary_in ^ (binary_in >> 1);
+        end
+        else begin
+            gray_out = gray_out; // Hold previous output
+        end
+    end
+
+    // Update prev_binary when input changes
+    always_ff @(binary_in) begin
+        prev_binary <= binary_in;
+    end
+
+endmodule
